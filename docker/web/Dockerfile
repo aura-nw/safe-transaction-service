@@ -26,13 +26,13 @@ RUN set -ex \
 
 # /nginx mount point must be created before so it doesn't have root permissions
 # ${APP_HOME} root folder will not be updated by COPY --chown, so permissions need to be adjusted
-# RUN groupadd -g 999 python && \
-#     useradd -u 999 -r -g python python && \
-#     mkdir -p /nginx && \
-#     chown -R python:python /nginx ${APP_HOME}
-# COPY --chown=python:python . .
+RUN groupadd -g 999 python && \
+    useradd -u 999 -r -g python python && \
+    mkdir -p /nginx && \
+    chown -R python:python /nginx ${APP_HOME}
+COPY --chown=python:python . .
 
-# # Use numeric ids so kubernetes identifies the user correctly
-# USER 999:999
+# Use numeric ids so kubernetes identifies the user correctly
+USER 999:999
 COPY . .
 RUN DJANGO_SETTINGS_MODULE=config.settings.local DJANGO_DOT_ENV_FILE=.env.local python manage.py collectstatic --noinput
